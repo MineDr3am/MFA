@@ -1,11 +1,9 @@
 <?php
-  if (isset($_POST["login"]) && isset($_POST["pw"])) {
-    if($_POST["login"] == "Hugo" && $_POST["pw"] == "Hugo123"){
-      print("connected !");
-    }
-  }
 
- ?>
+require_once('lib/otphp.php');
+
+?>
+
  <!DOCTYPE html>
  <html>
  <body>
@@ -20,10 +18,36 @@
    <input type="password" id="pw" name="pw" value="Hugo123"><br><br>
 
    <label for="otp">OTP :</label><br>
-   <input type="password" id="otp" name="otp" value=""><br><br>
+   <input type="text" id="otp" name="otp" value=""><br><br>
 
    <input type="submit" value="Valider">
  </form>
 
  </body>
  </html>
+
+
+<?php
+
+ session_start();
+   if (isset($_POST["login"]) && isset($_POST["pw"]) && isset($_POST["otp"])) {
+     if($_POST["login"] == "Hugo" && $_POST["pw"] == "Hugo123"){
+       $decalage = 0; // (en secondes)
+
+       date_default_timezone_set('Europe/Paris');
+
+       $maintenant = time() + $decalage;
+
+       print(date('Y-m-d H:i:s',$maintenant));
+
+       $totp = new \OTPHP\TOTP("NRQXK43FNZQXU===",array('interval'=>30));
+       echo $totp->at($maintenant);
+       if ($_POST["otp"] == $totp->at($maintenant)) {
+         print("connected !");
+       }
+     }
+   }
+
+
+
+?>
